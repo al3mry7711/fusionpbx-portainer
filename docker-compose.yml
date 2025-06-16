@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: fusionpbx
+      POSTGRES_PASSWORD: supersecurepassword
+      POSTGRES_DB: fusionpbx
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  freeswitch:
+    image: ghcr.io/patrickbaus/freeswitch-docker:latest
+    cap_add:
+      - SYS_NICE
+    network_mode: host
+
+  fusionpbx_web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    ports:
+      - "80:80"
+      - "443:443"
+    network_mode: bridge
+
+volumes:
+  db_data:
